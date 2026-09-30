@@ -1,0 +1,12 @@
+{
+  "name": "rosetta-t11-renderer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rosetta T11 TradingView Lightweight Charts rendering surface",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "lightweight-charts": "5.2.1"
+  }
+}
