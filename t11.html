@@ -1,0 +1,36 @@
+<!doctype html><html><head><meta charset="utf-8"><title>T11 Manifest Renderer</title><style>
+:root{--bg:#031019;--panel:#061824;--line:#1b7190;--muted:#7aa8bc;--white:#f2f6f8;--green:#30e677;--red:#ff4e61;--yellow:#f6cb4a;--blue:#4da3ff;--purple:#b468ff;--teal:#5fd6e8;}
+*{box-sizing:border-box} body{margin:0;background:#000;color:var(--white);font-family:Arial,Helvetica,sans-serif;font-weight:600}
+.page{width:1600px;height:1000px;margin:0 auto;background:linear-gradient(180deg,#020a10,#03121d 55%,#020b11);padding:8px 10px 6px;position:relative;overflow:hidden;page-break-after:always}
+.header{height:62px;display:grid;grid-template-columns:110px 330px 1fr 300px;border:1px solid #1c5f7c;background:#020910}
+.logo{font-size:52px;font-weight:900;padding:2px 8px;border-right:1px solid #215a73;background:linear-gradient(180deg,#fff,#8b8b8b);color:transparent;background-clip:text;-webkit-background-clip:text}
+.asset{padding:7px 12px;border-right:1px solid #215a73}.asset .ticker{font-size:31px;letter-spacing:.5px}.asset .name{font-size:12px;color:#cdd8de;margin-top:2px}
+.title{padding:8px 14px;border-right:1px solid #215a73}.title .big{font-size:25px;letter-spacing:.8px}.title .sub{font-size:11px;color:#c7d5db;margin-top:8px;word-spacing:8px}
+.clock{padding:7px 10px;font-size:17px}.clock b{font-size:23px}.clock small{font-size:11px;color:#a7bcc6}
+.topcharts{height:286px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:6px}
+.panel{border:1px solid #1d6b88;background:#04131d;position:relative;overflow:hidden}.panel h3{margin:0;padding:7px 8px;border-bottom:1px solid #1d6b88;background:#05111a;font-size:15px;text-align:center}.state{height:38px;padding:8px 8px 2px;font-size:13px}.state.green{color:var(--green)}.state.red{color:var(--red)}.state.yellow{color:var(--yellow)}.state.muted{color:#9db3bd}.chart{position:absolute;left:4px;right:4px;bottom:2px;top:70px}
+.mainrow{height:430px;display:grid;grid-template-columns:1fr 175px 260px;gap:6px;margin-top:6px}.mainchart{position:relative}.mainchart .chart{top:55px;bottom:4px}.mainchart h3{text-align:left;font-size:17px}.session-strip{position:absolute;z-index:3;left:16px;right:80px;top:60px;height:37px;display:grid;grid-template-columns:repeat(4,1fr);pointer-events:none}.session-strip span{border-right:1px solid rgba(100,160,190,.35);background:rgba(80,120,170,.10);font-size:11px;text-align:center;padding-top:5px;color:#dbeaf0}
+.paths{display:grid;grid-template-rows:1fr 1fr;gap:8px}.pathbox{border:2px solid;padding:11px 12px;font-size:14px;line-height:1.35}.pathbox.green{border-color:var(--green);color:#dfffea}.pathbox.red{border-color:var(--red);color:#ffdfe3}.pathbox .ptitle{font-size:18px;font-weight:900;margin-bottom:8px}.arrow{font-size:38px;line-height:1;color:inherit}.range{padding:0 8px}.range h3{text-align:left;color:#ffd550}.table{font-size:13px;border-collapse:collapse;width:100%}.table td{border-bottom:1px solid #315467;padding:5px 4px}.table td:last-child{text-align:right}.greenTxt{color:var(--green)}.redTxt{color:var(--red)}.yellowTxt{color:var(--yellow)}.blueTxt{color:#61b5ff}.muted{color:#92a8b4}
+.info{height:116px;display:grid;grid-template-columns:1.25fr 1.05fr .95fr .95fr 1.2fr;gap:6px;margin-top:6px}.infobox{border:1px solid #245c73;background:#03111a;padding:7px 9px;overflow:hidden}.infobox h4{margin:0 0 5px;font-size:12px}.infobox ul{margin:0;padding-left:16px;font-size:11px;line-height:1.38;font-weight:500}
+.decision{height:87px;margin-top:5px;border:1px solid #6f7478;background:#eef2ef;color:#071018}.decision .bar{height:20px;background:linear-gradient(90deg,#ffe47c,#d9e4e6);font-size:12px;padding:3px 7px;font-weight:900}.decision .cols{display:grid;grid-template-columns:1.25fr 1.25fr 1.45fr 1.45fr 1.35fr 1fr;height:65px}.decision .cell{border-right:1px solid #777;padding:4px 7px;font-size:10px;line-height:1.24}.decision .cell b{font-size:10px}.decision .cell ul{margin:2px 0 0;padding-left:13px}
+.footer{position:absolute;bottom:0;left:10px;right:10px;height:21px;border-top:1px solid #173d50;font-size:10px;display:flex;justify-content:space-between;align-items:center;color:#d9e3e7}
+/* Page 2 */
+.p2grid{height:837px;margin-top:7px;display:grid;grid-template-columns:1.35fr 1fr;grid-template-rows:350px 1fr;gap:8px}.chartblock{border:1px solid #1d6b88;background:#04131d;padding:8px;position:relative}.chartblock h3{margin:0 0 6px;font-size:17px}.bigchart{height:305px}.stack{display:grid;grid-template-rows:repeat(4,1fr);gap:8px}.analysisbox{border:1px solid #285e75;background:#03111a;padding:9px 11px}.analysisbox h3{font-size:14px;margin:0 0 6px;color:#e8f3f7}.analysisbox p,.analysisbox li{font-size:12px;line-height:1.35;font-weight:500;margin:0}.analysisbox ul{margin:0;padding-left:16px}.bottomgrid{grid-column:1 / 3;display:grid;grid-template-columns:1.1fr 1.1fr 1fr 1fr;gap:8px}.callout{border:1px solid #285e75;padding:10px;background:#04131d}.callout h3{margin:0 0 7px;font-size:14px}.callout p,.callout li{font-size:12px;line-height:1.4;font-weight:500}.callout ul{margin:0;padding-left:16px}
+@media print{body{background:#fff}.page{margin:0;page-break-after:always}@page{size:16in 10in;margin:0}}
+</style></head><body>
+<div class="page">
+  <div class="header" id="header1"></div>
+  <div class="topcharts" id="topcharts"></div>
+  <div class="mainrow" id="mainrow"></div>
+  <div class="info" id="info"></div>
+  <div class="decision" id="decision"></div>
+  <div class="footer" id="footer1"></div>
+</div>
+<div class="page">
+  <div class="header" id="header2"></div>
+  <div class="p2grid" id="p2grid"></div>
+  <div class="footer" id="footer2"></div>
+</div>
+<script src="/assets/lightweight-charts.standalone.production.js"></script>
+<script src="/t11-renderer.js"></script>
+</body></html>
