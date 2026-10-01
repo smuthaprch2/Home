@@ -1,14 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-
-const root = __dirname;
-const dist = path.join(root, 'dist');
-const assets = path.join(dist, 'assets');
-fs.rmSync(dist, { recursive: true, force: true });
-fs.mkdirSync(assets, { recursive: true });
-fs.copyFileSync(path.join(root, 'index.html'), path.join(dist, 'index.html'));
-fs.copyFileSync(
-  path.join(root, 'node_modules', 'lightweight-charts', 'dist', 'lightweight-charts.standalone.production.js'),
-  path.join(assets, 'lightweight-charts.standalone.production.js')
-);
-console.log('Built Rosetta T11 static site in dist/');
+import fs from 'node:fs';
+import path from 'node:path';
+fs.rmSync('dist',{recursive:true,force:true});
+fs.mkdirSync('dist/assets',{recursive:true});
+fs.mkdirSync('dist/manifests',{recursive:true});
+for (const f of ['index.html','t11.html','t11-renderer.js']) fs.copyFileSync(f,path.join('dist',f));
+for (const f of fs.readdirSync('manifests')) if (f.endsWith('.json')) fs.copyFileSync(path.join('manifests',f),path.join('dist/manifests',f));
+fs.copyFileSync('node_modules/lightweight-charts/dist/lightweight-charts.standalone.production.js','dist/assets/lightweight-charts.standalone.production.js');
