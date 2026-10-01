@@ -18,7 +18,7 @@ jobs:
       - name: Render and compare Golden Master
         run: |
           python3 -m http.server 4173 --directory dist >/tmp/t11-http.log 2>&1 &
-          cat > /tmp/t11-compare.mjs <<'JS'
+          cat > t11-compare.mjs <<'JS'
           import { chromium } from 'playwright';
           import fs from 'node:fs';
           import pixelmatch from 'pixelmatch';
@@ -47,7 +47,7 @@ jobs:
           console.log(JSON.stringify({diff_pixels:n,diff_ratio:ratio}));
           if(ratio>0.001) process.exit(1);
           JS
-          node /tmp/t11-compare.mjs
+          node t11-compare.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
