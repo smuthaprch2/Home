@@ -138,6 +138,57 @@ async function runStartupSystemTest() {
   }
 }
 
+async function runProductionRouteTests() {
+  if (process.env.SEND_PRODUCTION_TEST !== "1") return;
+
+  const tests = [
+    {
+      route: "family",
+      title: "FAMILY ALERTS — Production Test",
+      message: "Family alert delivery is operational.",
+      source: "Family Command / Render",
+      action: "Confirm this arrived in #family-alerts."
+    },
+    {
+      route: "task",
+      title: "TASK ALERTS — Production Test",
+      message: "Task escalation delivery is operational.",
+      source: "Family Command / Render",
+      action: "Confirm this arrived in #task-alerts."
+    },
+    {
+      route: "command",
+      title: "COMMAND BRIEFS — Production Test",
+      message: "Command brief delivery is operational.",
+      source: "Family Command / Render",
+      action: "Confirm this arrived in #command-briefs."
+    }
+  ];
+
+  for (const test of tests) {
+    const envName = ROUTES[test.route];
+    const webhookUrl = process.env[envName];
+
+    if (!webhookUrl) {
+      console.log(`production test skipped: ${test.route} webhook not configured`);
+      continue;
+    }
+
+    try {
+      await postDiscord(webhookUrl, buildDiscordPayload({
+        title: test.title,
+        message: test.message,
+        severity: "success",
+        source: test.source,
+        action: test.action
+      }));
+      console.log(`production test delivered: ${test.route}`);
+    } catch (error) {
+      console.error(`production test failed: ${test.route}:`, error.message);
+    }
+  }
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
@@ -193,4 +244,5 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`discord-alert-router listening on ${PORT}`);
   runStartupSystemTest();
+  runProductionRouteTests();
 });
