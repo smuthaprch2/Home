@@ -116,6 +116,28 @@ function buildDiscordPayload(body) {
   };
 }
 
+async function runStartupSystemTest() {
+  if (process.env.SEND_STARTUP_TEST !== "1") return;
+  const webhookUrl = process.env.DISCORD_SYSTEM_TEST_WEBHOOK;
+  if (!webhookUrl) {
+    console.log("startup test skipped: system webhook not configured");
+    return;
+  }
+
+  try {
+    await postDiscord(webhookUrl, buildDiscordPayload({
+      title: "SYSTEM TEST — Stage 1",
+      message: "Discord delivery from the Huggins Command alert router is operational.",
+      severity: "success",
+      source: "Family Command / Render",
+      action: "Confirm this alert was visible and audible on the intended devices."
+    }));
+    console.log("startup system test delivered");
+  } catch (error) {
+    console.error("startup system test failed:", error.message);
+  }
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
@@ -170,4 +192,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`discord-alert-router listening on ${PORT}`);
+  runStartupSystemTest();
 });
