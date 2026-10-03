@@ -1,0 +1,59 @@
+name: T11 visual regression
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npm install --no-save playwright pixelmatch pngjs
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Render and compare Golden Master
+        run: |
+          python3 -m http.server 4173 --directory dist >/tmp/t11-http.log 2>&1 &
+          cat > t11-compare.mjs <<'JS'
+          import { chromium } from 'playwright';
+          import fs from 'node:fs';
+          import pixelmatch from 'pixelmatch';
+          import { PNG } from 'pngjs';
+
+          const browser = await chromium.launch({headless:true});
+          async function shot(url,out,readyExpr){
+            const p=await browser.newPage({viewport:{width:1600,height:1000},deviceScaleFactor:1});
+            await p.goto(url,{waitUntil:'networkidle'});
+            if(readyExpr) await p.waitForFunction(readyExpr,{timeout:15000});
+            await p.screenshot({path:out,fullPage:true,animations:'disabled'});
+            await p.close();
+          }
+          await shot('http://127.0.0.1:4173/index.html','golden-static.png');
+          await shot('http://127.0.0.1:4173/t11.html?manifest=/manifests/aapl-golden.json','golden-manifest.png','window.__T11_RENDER_READY__===true');
+          await browser.close();
+
+          const a=PNG.sync.read(fs.readFileSync('golden-static.png'));
+          const b=PNG.sync.read(fs.readFileSync('golden-manifest.png'));
+          if(a.width!==b.width||a.height!==b.height) throw new Error(`dimension mismatch ${a.width}x${a.height} vs ${b.width}x${b.height}`);
+          const diff=new PNG({width:a.width,height:a.height});
+          const n=pixelmatch(a.data,b.data,diff.data,a.width,a.height,{threshold:0.1,includeAA:false});
+          fs.writeFileSync('golden-diff.png',PNG.sync.write(diff));
+          const ratio=n/(a.width*a.height);
+          fs.writeFileSync('t11-regression.json',JSON.stringify({width:a.width,height:a.height,diff_pixels:n,diff_ratio:ratio,pass:ratio<=0.001},null,2));
+          console.log(JSON.stringify({diff_pixels:n,diff_ratio:ratio}));
+          if(ratio>0.001) process.exit(1);
+          JS
+          node t11-compare.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t11-visual-regression
+          path: |
+            golden-static.png
+            golden-manifest.png
+            golden-diff.png
+            t11-regression.json
