@@ -1,7 +1,7 @@
 const http = require("http");
 
 const PORT = Number(process.env.PORT || 10000);
-const ROUTER_TOKEN = process.env.ROUTER_TOKEN || "";
+const ROUTER_TOKEN = process.env.ROUTER_TOKEN || "";\nconst BRIDGE_TOKEN = process.env.BRIDGE_TOKEN || "";\nconst DEDUPE_TTL_MS = 14 * 24 * 60 * 60 * 1000;\nconst recentKeys = new Map();
 
 const ROUTES = {
   system: "DISCORD_SYSTEM_TEST_WEBHOOK",
