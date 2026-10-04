@@ -1,4 +1,5 @@
 const http = require("http");
+const { getKey: getFlightAwareKey, getCityPair, rankFlights } = require("./flightaware");
 
 const PORT = Number(process.env.PORT || 10000);
 const ROUTER_TOKEN = process.env.ROUTER_TOKEN || "";
@@ -214,8 +215,52 @@ const server = http.createServer(async (req, res) => {
       configuredRoutes: Object.fromEntries(
         Object.entries(ROUTES).map(([route, env]) => [route, Boolean(process.env[env])])
       ),
-      bridgeAuthConfigured: Boolean(BRIDGE_TOKEN)
+      bridgeAuthConfigured: Boolean(BRIDGE_TOKEN),
+      flightAwareConfigured: Boolean(getFlightAwareKey())
     });
+  }
+
+  if (req.method === "GET" && url.pathname === "/commute/options") {
+    if (!authorize(req)) {
+      return json(res, 401, { ok: false, error: "unauthorized" });
+    }
+
+    try {
+      const origin = String(url.searchParams.get("origin") || "").trim().toUpperCase();
+      const destination = String(url.searchParams.get("destination") || "").trim().toUpperCase();
+      const earliestDeparture = url.searchParams.get("earliest_departure") || "";
+      const latestArrival = url.searchParams.get("latest_arrival") || "";
+      const maxPages = Number(url.searchParams.get("max_pages") || 2);
+      const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit") || 10), 25));
+
+      if (!origin || !destination) {
+        return json(res, 400, { ok: false, error: "origin_and_destination_required" });
+      }
+
+      const flights = await getCityPair(origin, destination, maxPages);
+      const ranked = rankFlights(flights, {
+        earliestDeparture,
+        latestArrival,
+        includePast: url.searchParams.get("include_past") || ""
+      }).slice(0, limit);
+
+      return json(res, 200, {
+        ok: true,
+        source: "FlightAware AeroAPI",
+        origin,
+        destination,
+        filters: {
+          earliestDeparture: earliestDeparture || null,
+          latestArrival: latestArrival || null
+        },
+        count: ranked.length,
+        flights: ranked
+      });
+    } catch (error) {
+      const message = error && error.message ? error.message : "unknown_error";
+      const status = error && error.statusCode ? error.statusCode : 502;
+      return json(res, status, { ok: false, error: message });
+    }
   }
 
   if (req.method === "POST" && url.pathname === "/alert") {
