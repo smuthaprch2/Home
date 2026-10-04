@@ -51,9 +51,21 @@ function readBody(req) {
 }
 
 function authorize(req) {
-  if (!ROUTER_TOKEN) return false;
   const auth = req.headers.authorization || "";
-  return auth === `Bearer ${ROUTER_TOKEN}`;
+  if (ROUTER_TOKEN && auth === `Bearer ${ROUTER_TOKEN}`) return true;
+  if (BRIDGE_TOKEN && auth === `Bearer ${BRIDGE_TOKEN}`) return true;
+  return false;
+}
+
+function isDuplicate(key) {
+  if (!key) return false;
+  const now = Date.now();
+  for (const [k, ts] of recentKeys) {
+    if (now - ts > DEDUPE_TTL_MS) recentKeys.delete(k);
+  }
+  if (recentKeys.has(key)) return true;
+  recentKeys.set(key, now);
+  return false;
 }
 
 async function postDiscord(webhookUrl, payload) {
@@ -209,6 +221,10 @@ const server = http.createServer(async (req, res) => {
 
     try {
       const body = await readBody(req);
+      const dedupeKey = String(body.dedupeKey || "").slice(0, 500);
+      if (isDuplicate(dedupeKey)) {
+        return json(res, 200, { ok: true, deduped: true });
+      }
       const route = String(body.route || "").toLowerCase();
       const envName = ROUTES[route];
 
