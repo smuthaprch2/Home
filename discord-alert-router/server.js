@@ -1,7 +1,10 @@
 const http = require("http");
 
 const PORT = Number(process.env.PORT || 10000);
-const ROUTER_TOKEN = process.env.ROUTER_TOKEN || "";\nconst BRIDGE_TOKEN = process.env.BRIDGE_TOKEN || "";\nconst DEDUPE_TTL_MS = 14 * 24 * 60 * 60 * 1000;\nconst recentKeys = new Map();
+const ROUTER_TOKEN = process.env.ROUTER_TOKEN || "";
+const BRIDGE_TOKEN = process.env.BRIDGE_TOKEN || "";
+const DEDUPE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
+const recentKeys = new Map();
 
 const ROUTES = {
   system: "DISCORD_SYSTEM_TEST_WEBHOOK",
@@ -210,7 +213,8 @@ const server = http.createServer(async (req, res) => {
       service: "discord-alert-router",
       configuredRoutes: Object.fromEntries(
         Object.entries(ROUTES).map(([route, env]) => [route, Boolean(process.env[env])])
-      )
+      ),
+      bridgeAuthConfigured: Boolean(BRIDGE_TOKEN)
     });
   }
 
@@ -225,6 +229,7 @@ const server = http.createServer(async (req, res) => {
       if (isDuplicate(dedupeKey)) {
         return json(res, 200, { ok: true, deduped: true });
       }
+
       const route = String(body.route || "").toLowerCase();
       const envName = ROUTES[route];
 
