@@ -7,6 +7,10 @@
     "node": ">=18"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "bridge": "node bridge.js"
+  },
+  "dependencies": {
+    "node-ical": "0.27.3"
   }
 }
